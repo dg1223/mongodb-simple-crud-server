@@ -4,10 +4,12 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
-// middleware
+/* middleware */
+/* ---------- */
 app.use(cors());
 
 // sets POST request header, content-type, body etc.
+// recieves data from html body
 app.use(express.json());
 
 // configure MongoDB
@@ -53,8 +55,31 @@ async function run() {
       const user = req.body;
       console.log("new user: ", user);
 
-      // store data in DB
+      // store data in DB (POST process)
       const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+
+    // PUT (upsert)
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const user = req.body;
+      console.log(id, user);
+
+      // main UPSERT process
+      const filter = { _id: new ObjectId(id) };
+      const option = { upsert: true };
+      const updatedUser = {
+        $set: {
+          name: user.name,
+          email: user.email,
+        },
+      };
+      const result = await userCollection.updateOne(
+        filter,
+        updatedUser,
+        option
+      );
       res.send(result);
     });
 
@@ -62,6 +87,8 @@ async function run() {
     app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
       console.log("Please delete from database: ", id);
+
+      // main DELETE process
       const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
       res.send(result);
