@@ -34,9 +34,18 @@ async function run() {
 
     // GET
     app.get("/users", async (req, res) => {
+      // Find multiple documents (MongoDB site)
       const cursor = userCollection.find();
       const result = await cursor.toArray();
       res.send(result);
+    });
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      // Find one documents (MongoDB site)
+      const user = await userCollection.findOne(query);
+      res.send(user);
     });
 
     // POST
