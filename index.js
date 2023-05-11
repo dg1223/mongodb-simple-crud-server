@@ -49,6 +49,7 @@ async function run() {
       res.send(result);
     });
 
+    // DELETE
     app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
       console.log("Please delete from database: ", id);
